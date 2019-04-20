@@ -2,8 +2,7 @@
 
 [![Build Status](https://travis-ci.com/davicken/iReporter3_API.svg?branch=develop)](https://travis-ci.com/davicken/iReporter3_API)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c4f68340cb371aca04ce/maintainability)](https://codeclimate.com/github/davicken/iReporter3_API/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/c4f68340cb371aca04ce/test_coverage)](https://codeclimate.com/github/davicken/iReporter3_API/test_coverage)
-[![Coverage Status](https://coveralls.io/repos/github/davicken/iReporter3_API/badge.svg?branch=develop)](https://coveralls.io/github/davicken/iReporter3_API?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/davicken/iReporter3_API/badge.svg?branch=ft-authentication)](https://coveralls.io/github/davicken/iReporter3_API?branch=ft-authenticatgiion)
 
 
   * iReporter is a corruption reporting and awareness platform that seeks for a reduced corruption level and government intervention.
