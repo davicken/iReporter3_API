@@ -1,4 +1,4 @@
-# File to handle tests for all red-flags endpoints
+# File to handle tests for all incidents endpoints
 import unittest
 from flask import request
 import json
@@ -8,7 +8,7 @@ from api.controllers.incident_controller import my_incidents
 
 
 class TestRedflagEndPoints(unittest.TestCase):
-    # Class for testing the red-flag endpoints
+    # Class for testing the incident endpoints
     def setUp(self):
         self.test_app = app.test_client(self)
 
@@ -26,18 +26,18 @@ class TestRedflagEndPoints(unittest.TestCase):
             "message": [
                     "Welcome to Mwesigwa\'s iReporter APIs home",
                     "Incident Endpoints",
-                    "#1 : GET /api/v1/red-flags",
-                    "#2 : GET /api/v1/red-flags/<red_flag_id>",
-                    "#3 : POST /api/v1/red-flags",
-                    "#4 : PATCH /api/v1/red-flags/<red_flag_id>/location",
-                    "#5 : PATCH /api/v1/red-flags/<red_flag_id>/comment",
-                    "#6 : DELETE /api/v1/red-flags/<red_flag_id>"
+                    "#1 : GET /api/v1/incidents",
+                    "#2 : GET /api/v1/incidents/<incident_id>",
+                    "#3 : POST /api/v1/incidents",
+                    "#4 : PATCH /api/v1/incidents/<incident_id>/location",
+                    "#5 : PATCH /api/v1/incidents/<incident_id>/comment",
+                    "#6 : DELETE /api/v1/incidents/<incident_id>"
                     ]
         }
         self.assertEqual(json.loads(my_data), message)
 
     def test_all_redflags_when_not_empty(self): 
-        # tests for getting all red-flags  when the red-flag list has 1 or more red-flag records
+        # tests for getting all incidents  when the incident list has 1 or more incident records
         input_data1 = {
             "title": "corruption at the office",
             "images": ["image1", "image2"],
@@ -45,7 +45,7 @@ class TestRedflagEndPoints(unittest.TestCase):
             "comment": "corruption has become a menace",
             "location": {"lat": "0.3333", "long": "1.0444"}
         }
-        post_resp1 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
+        post_resp1 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
         self.assertEqual(post_resp1.status_code,201)
 
         input_data2 = {
@@ -56,9 +56,9 @@ class TestRedflagEndPoints(unittest.TestCase):
         
                "location": {"lat": "0.3443", "long": "1.4334"}
         }
-        post_resp2 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
+        post_resp2 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
         self.assertEqual(post_resp2.status_code,201)
-        response = self.test_app.get('/api/v1/red-flags')
+        response = self.test_app.get('/api/v1/incidents')
         self.assertEqual(response.status_code, 200)
 
         my_data = json.loads(response.data.decode())
@@ -72,12 +72,12 @@ class TestRedflagEndPoints(unittest.TestCase):
 
 
     def test_all_redflags_when_empty(self):
-        # test the get all red-flag endpoint when the red-flag list has no red-flag records or empty
-        response = self.test_app.get('/api/v1/red-flags')
+        # test the get all incident endpoint when the incident list has no incident records or empty
+        response = self.test_app.get('/api/v1/incidents')
         my_data = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(my_data['error'], 'There are no red-flag records currently')
-        self.assertIn('no red-flag records', my_data['error'])
+        self.assertEqual(my_data['error'], 'There are no incident records currently')
+        self.assertIn('no incident records', my_data['error'])
 
 
     def test_create_redflag_with_correct_data(self):
@@ -90,16 +90,16 @@ class TestRedflagEndPoints(unittest.TestCase):
             "location": {"lat": "98854", "long": "888484"}
             }
         post_resp = self.test_app.post(
-            '/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data), headers={'userId': 1})
+            '/api/v1/incidents', content_type='application/json', data=json.dumps(input_data), headers={'userId': 1})
         self.assertEqual(post_resp.status_code, 201)
         response = json.loads(post_resp.data.decode())
         my_data = response['data']
         self.assertEqual(response['status'], 201)
-        self.assertEqual(my_data[0]['message'], "created red-flag record successfully")
+        self.assertEqual(my_data[0]['message'], "created incident record successfully")
 
 
     def test_create_redflag_with_wrong_comment_format(self):
-        # tests a red-flag created with a wrong or totally no Comment 
+        # tests a incident created with a wrong or totally no Comment 
         input_data1 = {
             # Comment with wrong data type
             "title": "corruption at the office",
@@ -124,23 +124,23 @@ class TestRedflagEndPoints(unittest.TestCase):
             "comment": "     ",
             "location": {"lat": "98854", "long": "888484"}
             }
-        post_resp1 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
+        post_resp1 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
         response = json.loads(post_resp1.data.decode())
         self.assertEqual(response['error'], 400)
         self.assertEqual(response['message'], "Comment and Title Should be strings")
 
-        post_resp2 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
+        post_resp2 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
         response = json.loads(post_resp2.data.decode())
         self.assertEqual(response['error'], 400)
         self.assertEqual(response['message'], "Comment and Title Should be strings")
 
-        post_resp3 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data3), headers={'userId': 1})
+        post_resp3 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data3), headers={'userId': 1})
         response = json.loads(post_resp3.data.decode())
         self.assertEqual(response['error'], 400)
         self.assertEqual(response['message'], "Comment and Title Should be strings")
 
     def test_create_redflag_with_wrong_location_format(self):
-        # tests a red-flag created with a wrong location data type, length or totally no location 
+        # tests a incident created with a wrong location data type, length or totally no location 
         input_data1 = {
             # location with wrong data type
             "title": "corruption at the office",
@@ -165,66 +165,66 @@ class TestRedflagEndPoints(unittest.TestCase):
             "comment": "my comment",
             "location": {"lat": "98854", "long": "888484", "lat-long":"3454-2348"}
             }
-        post_resp1 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
+        post_resp1 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
         response = json.loads(post_resp1.data.decode())
         self.assertEqual(response['error'], 400)
         self.assertEqual(response['message'], "location should be a dictionary with two items; Latitude and Longitude coordinates")
 
-        post_resp2 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
+        post_resp2 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
         response = json.loads(post_resp2.data.decode())
         self.assertEqual(response['error'], 400)
         self.assertEqual(response['message'], "location should be a dictionary with two items; Latitude and Longitude coordinates")
 
-        post_resp3 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data3), headers={'userId': 1})
+        post_resp3 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data3), headers={'userId': 1})
         response = json.loads(post_resp3.data.decode())
         self.assertEqual(response['error'], 400)
         self.assertEqual(response['message'], "location should be a dictionary with two items; Latitude and Longitude coordinates")
 
-    def test_create_redflag_with_wrong_title_format(self):
-        # tests a red-flag created with a wrong or totally no title 
-        input_data1 = {
-            # title with wrong data type
-            "title": 34,
-            "images": ["image1", "image2"],
-            "videos": ["video1", "video2"],
-            "comment": "my comment",
-            "location": {"lat": "98854", "long": "888484"}
-            }
-        input_data2 = {
-            # No title provided
-            "title": "",
-            "images": ["image1", "image2"],
-            "videos": ["video1", "video2"],
-            "comment": "my comment",
-            "location": {"lat": "98854", "long": "888484"}
-            }
-        input_data3 = {
-            # title with just white spaces
-            "title": "    ",
-            "images": ["image1", "image2"],
-            "videos": ["video1", "video2"],
-            "comment": "my comment",
-            "location": {"lat": "98854", "long": "888484"}
-            }
-        post_resp1 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
-        response = json.loads(post_resp1.data.decode())
-        self.assertEqual(response['error'], 400)
-        self.assertEqual(response['message'], "Comment and Title Should be strings")
+    # def test_create_redflag_with_wrong_title_format(self):
+    #     # tests a incident created with a wrong or totally no title 
+    #     input_data1 = {
+    #         # title with wrong data type
+    #         "title": 34,
+    #         "images": ["image1", "image2"],
+    #         "videos": ["video1", "video2"],
+    #         "comment": "my comment",
+    #         "location": {"lat": "98854", "long": "888484"}
+    #         }
+    #     input_data2 = {
+    #         # No title provided
+    #         "title": "",
+    #         "images": ["image1", "image2"],
+    #         "videos": ["video1", "video2"],
+    #         "comment": "my comment",
+    #         "location": {"lat": "98854", "long": "888484"}
+    #         }
+    #     input_data3 = {
+    #         # title with just white spaces
+    #         "title": "    ",
+    #         "images": ["image1", "image2"],
+    #         "videos": ["video1", "video2"],
+    #         "comment": "my comment",
+    #         "location": {"lat": "98854", "long": "888484"}
+    #         }
+    #     post_resp1 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data1), headers={'userId': 1})
+    #     response = json.loads(post_resp1.data.decode())
+    #     self.assertEqual(response['error'], 400)
+    #     self.assertEqual(response['message'], "Comment and Title Should be strings")
 
-        post_resp2 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
-        response = json.loads(post_resp2.data.decode())
-        self.assertEqual(response['error'], 400)
-        self.assertEqual(response['message'], "Comment and Title Should be strings")
+    #     post_resp2 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data2), headers={'userId': 1})
+    #     response = json.loads(post_resp2.data.decode())
+    #     self.assertEqual(response['error'], 400)
+    #     self.assertEqual(response['message'], "Comment and Title Should be strings")
 
-        post_resp3 = self.test_app.post('/api/v1/red-flags', content_type='application/json', data=json.dumps(input_data3), headers={'userId': 1})
-        response = json.loads(post_resp3.data.decode())
-        self.assertEqual(response['error'], 400)
-        self.assertEqual(response['message'], "Comment and Title Should be strings")
+    #     post_resp3 = self.test_app.post('/api/v1/incidents', content_type='application/json', data=json.dumps(input_data3), headers={'userId': 1})
+    #     response = json.loads(post_resp3.data.decode())
+    #     self.assertEqual(response['error'], 400)
+    #     self.assertEqual(response['message'], "Comment and Title Should be strings")
 
     
     # def test_edit_location_with_correct_id(self):
     #     # create an admin user since there's no option for signing him up
-    #     incident = RedFlag(
+    #     incident = Incident(
     #         incident_id = 1,
     #         location = {
     #             "lat": "0.0460",
@@ -242,10 +242,10 @@ class TestRedflagEndPoints(unittest.TestCase):
     #             "video2"
     #         ], 
     #         createdOn = "2019-03-18 03:31",
-    #         type = "red-flag", 
+    #         inc_type = "incident", 
     #         status= "draft"
     #     )
-    #     my_incidents.redflags.append(incident)
+    #     my_incidents.incidents_list.append(incident)
 
     #     input_data = {
     #         "title": "corruption3",
@@ -255,7 +255,7 @@ class TestRedflagEndPoints(unittest.TestCase):
     #         "location": {"lat": "0.0460", "long": "0.5557"}
     #         }
     #     patch_resp = self.test_app.post(
-    #         '/red-flags/1/location', content_type='application/json', data=json.dumps(input_data), headers={'userId': 1})
+    #         '/incidents/1/location', content_type='application/json', data=json.dumps(input_data), headers={'userId': 1})
        
     #     response = json.loads(patch_resp.data.decode())
     #     my_data = response['data']
