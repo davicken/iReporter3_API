@@ -6,11 +6,16 @@ from api import app
 from api.models.incident_model import Incident, IncidentData
 from api.controllers.incident_controller import my_incidents
 
+from api.models.database import DatabaseConnect
+
+
 
 class TestRedflagEndPoints(unittest.TestCase):
     # Class for testing the incident endpoints
     def setUp(self):
-        self.test_app = app.test_client(self)
+        self.test_app = app.test_client()
+        self.db = DatabaseConnect()
+        self.db.create_tables()
 
  
     def tear_down(self):
